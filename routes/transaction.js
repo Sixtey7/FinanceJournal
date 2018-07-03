@@ -23,29 +23,6 @@ let pool = new Pool({
 
 const TABLE_NAME = 'transactions';
 
-//GET ONE
-router.get('/testVal', function(req, res, next) {
-    //TODO: Stub implementation that that returns valid, but garbage data
-    let transaction = {
-        "id" : Number(req.params.transId),
-        "name" : "Trans " + req.params.transId,
-        "date" : new Date().toISOString(),
-        "amount" : 100,
-        "type" : "PLANNED"
-    }
-    //res.send('Returning details about Transaction: ' + req.params.transId);
-
-    //TODO playing with ajv and seeing how that validation works
-    if (validator(transaction)) {
-        res.send(transaction);
-    }
-    else {
-        _logger.info('failed');
-        res.status(500).send();
-        _logger.info(ajv.errorsText(validator.errors));
-    }
-});
-
 /**
  * Get all of the transactions from the database
  */
@@ -95,12 +72,6 @@ router.put('/', function(req, res, next) {
 
     _logger.debug('got the object %j', req.body);
 
-    _logger.debug('Id is: ' + req.body.id);
-
-    //let data = JSON.parse(req.body);
-
-    //_logger.debug('parsed the body %j', data);
-
     let data = req.body;
 
     if (validator(data)) {
@@ -108,8 +79,6 @@ router.put('/', function(req, res, next) {
             var client = await pool.connect();
 
             try {
-                //TODO: ID probably shouldn't be passed in here
-
                 let findBiggestNumberResult = await client.query('SELECT MAX(id) FROM ' + TABLE_NAME);
                 _logger.debug('largest number %d', findBiggestNumberResult.rows[0].max);
                 let result = await client.query('INSERT INTO ' + TABLE_NAME + ' (id, data) VALUES ($1, $2)', [findBiggestNumberResult.rows[0].max + 1, req.body]);
