@@ -101,45 +101,64 @@ router.put('/', function(req, res, next) {
 
     //_logger.debug('parsed the body %j', data);
 
-    (async () => {
-        var client = await pool.connect();
+    let data = req.body;
 
-        try {
-            //TODO: ID probably shouldn't be passed in here
+    if (validator(data)) {
+        (async () => {
+            var client = await pool.connect();
 
-            let findBiggestNumberResult = await client.query('SELECT MAX(id) FROM ' + TABLE_NAME);
-            _logger.debug('largest number %d', findBiggestNumberResult.rows[0].max);
-            let result = await client.query('INSERT INTO ' + TABLE_NAME + ' (id, data) VALUES ($1, $2)', [findBiggestNumberResult.rows[0].max + 1, req.body]);
-            _logger.debug('Got the result ' + result.rows[0]);
-            res.status(200).send();
-        }
-        finally {
-            client.release();
-        }
-    })().catch(e => {
-        _logger.error(e.message, e.stack);
-        res.status(500).send(e.message);
-    })
+            try {
+                //TODO: ID probably shouldn't be passed in here
+
+                let findBiggestNumberResult = await client.query('SELECT MAX(id) FROM ' + TABLE_NAME);
+                _logger.debug('largest number %d', findBiggestNumberResult.rows[0].max);
+                let result = await client.query('INSERT INTO ' + TABLE_NAME + ' (id, data) VALUES ($1, $2)', [findBiggestNumberResult.rows[0].max + 1, req.body]);
+                _logger.debug('Got the result ' + result.rows[0]);
+                res.status(200).send();
+            }
+            finally {
+                client.release();
+            }
+        })().catch(e => {
+            _logger.error(e.message, e.stack);
+            res.status(500).send(e.message);
+        });
+    }
+    else {
+        //data provided failed validation, return an error to the client
+        let errorText = ajv.errorsText(validator.errors);
+        _logger.warn('input provided failed validation with error %s', errorText);
+        res.status(400).send(errorText);
+    }
 });
 
 router.post('/:transId', function(req, res, next) {
     _logger.debug('Got an update for transaction %d with data %j', req.params.transId, req.body);
 
-    (async () => {
-        var client = await pool.connect();
+    let data = req.body;
+    if (validator(data)) {
+        (async () => {
+            var client = await pool.connect();
 
-        try {
-            let result = await client.query('UPDATE ' + TABLE_NAME + ' SET data = $2 where id = $1', [req.params.transId, req.body]);
-            _logger.debug('Got the result: ' + result.rows[0]);
-            res.status(200).send();
-        }
-        finally {
-            client.release();
-        }
-    })().catch(e => {
-        _logger.error(e.message, e.stack);
-        res.status(500).send(e.message);
-    });
+            try {
+                let result = await client.query('UPDATE ' + TABLE_NAME + ' SET data = $2 where id = $1', [req.params.transId, req.body]);
+                _logger.debug('Got the result: ' + result.rows[0]);
+                res.status(200).send();
+            }
+            finally {
+                client.release();
+            }
+        })().catch(e => {
+            _logger.error(e.message, e.stack);
+            res.status(500).send(e.message);
+        });
+    }
+    else {
+        //data provided failed validation, return an error to the client
+        let errorText = ajv.errorsText(validator.errors);
+        _logger.warn('input provided failed validation with error %s', errorText);
+        res.status(400).send(errorText);
+    }
 });
 
 module.exports = router;
