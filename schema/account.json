@@ -1,0 +1,12 @@
+{
+    "title" : "Account",
+    "type" : "object",
+    "properties" : {
+        "id" : {"type" : "number"},
+        "name" : {"type" : "string"},
+        "amount" : {"type" : "number"},
+        "notes" : {"type" : "string"},
+        "dynamic": {"type": "boolean"}
+    },
+    "required": ["name","date"]   
+}
