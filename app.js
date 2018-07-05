@@ -29,6 +29,7 @@ app.use('/users', usersRouter);
 //app.use('/', require('./routes/index'));
 app.use('/users', require('./routes/users'));
 app.use('/transactions', require('./routes/transaction'));
+app.use('/recurring', require('./routes/recurring'));
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

@@ -5,7 +5,6 @@ const pino = require('pino');
 const logLevels = Object.keys(pino.levels.values);
 
 module.exports = function(processName) {
-    console.log('building a logger!');
     let options = {
         name: processName,
         serializers: {
@@ -20,9 +19,7 @@ module.exports = function(processName) {
     
 
     let logger = pino(options, pretty);
-    logger.info('built a logger!');
-
-    logger.level = 'debug';
+    logger.debug('Logger configured for use!');
 
     return logger ;
 };

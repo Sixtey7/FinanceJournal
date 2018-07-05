@@ -6,7 +6,7 @@
         "name" : {"type" : "string"},
         "amount" : {"type" : "number"},
         "notes" : {"type" : "string"},
-        "type" : {"type" : "frequency", "enum": ["WEEKLY", "BI-WEEKLY", "MONTHLY"]},
+        "frequency" : {"type" : "string", "enum": ["WEEKLY", "BI-WEEKLY", "MONTHLY"]},
         "day_of_week" : {"type" : "string", "enum" : ["SU", "MO", "TU", "WE", "TH", "FR", "SA"]},
         "day_of_month" : {"type" : "number"},
         "end_date" : {"type" : "string", "format":"date-time"}
