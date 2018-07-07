@@ -10,7 +10,8 @@ module.exports = function(processName) {
         serializers: {
             req: pino.stdSerializers.req,
             res: pino.stdSerializers.res
-        }
+        },
+        level: 'debug'
     };
 
     //variable to store whether or not we're in dev mode
