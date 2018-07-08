@@ -47,7 +47,7 @@ router.get('/', function(req, res, next) {
     });
 });
 
-router.get('/recurrId', function(req, res, next) {
+router.get('/:recurrId', function(req, res, next) {
     _logger.debug('getting the recurring transaction for id: %d', req.params.recurrId);
     (async () => {
         var client = await pool.connect();

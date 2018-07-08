@@ -49,4 +49,26 @@ router.get('/', function(req, res, next) {
     });
 });
 
+/**
+ * Get a specific account from the database
+ */
+router.get('/:accountId', function (req, res, next) {
+    _logger.debug('getting the account with id %d', req.params.accountId);
+    (async () => {
+        var client = await pool.connect();
+        try {
+            let result = await client.query('SELECT * FROM ' + TABLE_NAME + ' where id = $1', [req.params.accountId]);
+            _logger.debug('Got the result %j', result.rows);
+            res.status(200).send(result.rows[0]);
+        }
+        finally { 
+            client.release();
+        }
+    })().catch(e => {
+        _logger.error(e.message);
+        _logger.error(e.stack);
+        resu.status(500).send(e.message);
+    });
+});
+
 module.exports = router;
