@@ -71,4 +71,37 @@ router.get('/:accountId', function (req, res, next) {
     });
 });
 
+/**
+ * Add a new account to the database
+ */
+router.put('/', function(req, res, next) {
+    _logger.debug('Adding a new account to the database: %j', req.body);
+
+    let data = req.body;
+
+    if (validator(data)) {
+        (async() => {
+            var client = await pool.connect();
+
+            try {
+                let findBiggestNumber = await client.query('SELECT MAX(id) FROM ' + TABLE_NAME);
+                let result = await client.query('INSERT INTO ' + TABLE_NAME + ' (id, data) VALUES ($1, $2)'[findBiggestNumber.rows[0].max + 1, req.body]);
+                res.status(200).send();
+            }
+            finally {
+                client.release();
+            }
+        })().catch(e => {
+            _logger.error(e.message);
+            _logger.error(e.stack);
+            res.status(500).send(e.message);
+        })
+    }
+    else {
+        let errorText = ajv.errorsText(validator.errors);
+        _logger.warn('input provided failed validation with error %s', errorText);
+        res.status(400).send(errorText);
+    }
+});
+
 module.exports = router;
