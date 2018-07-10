@@ -104,4 +104,33 @@ router.put('/', function(req, res, next) {
     }
 });
 
+router.post('/:accountId', function(req, res, next) {
+    _logger.debug('Got an update for account %d with data %j', req.params.accountId, req.body);
+
+    let data = req.body;
+    if (validator(data)) {
+        (async () => {
+            var client = await pool.connect();
+
+            try {
+                let result = await client.query('UPDATE ' + TABLE_NAME + ' SET data = $2 WHERE id = $1', [req.params.accountId, req.body]);
+                _logger.debug('Got the result: %j', result);
+                res.status(200).send();
+            }
+            finally {
+                client.release();
+            }
+        })().catch(e => {
+            _logger.error(e.message);
+            _logger.error(e.stack);
+            res.status(500).send(e.message);
+        });
+    }
+    else {
+        let errorText = ajv.errorsText(validator.errors);
+        _logger.warn('input provided failed validation with error %s', errorText);
+        res.status(400).send(errorText);
+    }
+});
+
 module.exports = router;
