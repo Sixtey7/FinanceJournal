@@ -9,5 +9,5 @@
         "type" : {"type" : "string", "enum": ["PLANNED", "ESTIMATE", "PENDING", "CONFIRMED"]},
         "notes" : {"type" : "string"}
     },
-    "required": ["name","date"]   
+    "required": ["name","date", "amount"]   
 }
