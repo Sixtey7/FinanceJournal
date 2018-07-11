@@ -71,11 +71,11 @@ class Importer {
                     }
                 }
                 else {
-                    if (estLoc < 0) {
+                    if (estLoc > 0) {
                         _logger.debug('found an estimate');
                         newTrans['type'] = 'ESTIMATE';
                     }
-                    if (plannedLoc < 0) {
+                    if (plannedLoc > 0) {
                         _logger.debug('found a planned');
                         newTrans['type'] = 'PLANNED';
                     }

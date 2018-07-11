@@ -9,6 +9,7 @@ class Transaction extends Component {
     constructor() {
         super();
         this.renderEditable = this.renderEditable.bind(this);
+        this.handleTypeChange = this.handleTypeChange.bind(this);
     }
 
     componentDidMount() {
@@ -16,7 +17,7 @@ class Transaction extends Component {
         fetch('/transactions')
             .then(res => res.json())
             .then(transactions => transactions.sort(function(a, b){ 
-                return a.id - b.id
+                return (new Date(a.data.date)) - (new Date(b.data.date))
             }))
             .then(transactions => this.setState({ transactions }));
     }
@@ -32,7 +33,8 @@ class Transaction extends Component {
                     transaction['data'][cellInfo.column.id] = e.target.innerHTML;
 
                     console.log('Set the property to: ' + JSON.stringify(transaction));
-                    //TODO make a post request to the backend to make the update
+
+                    this._updateTransaction(transaction['id'], transaction['data']);
 
                     //TODO if a debit or credit or date amount changes, need to do stuff
                 }}
@@ -45,6 +47,27 @@ class Transaction extends Component {
 
     renderAmountEditable(cellInfo) {
         //TODO Gotta handle the case where the debit or credit cells are edited, those need special attention
+    }
+
+    handleTypeChange(event) {
+        console.log('Transaction: ' + this.state.transactions[event.target.id]['data']['name'] + ' was change to: ' + event.target.value);
+        this.state.transactions[event.target.id]['data']['type'] = event.target.value;
+        this._updateTransaction(this.state.transactions[event.target.id]['id'], this.state.transactions[event.target.id]['data']);
+
+        //TODO: This needs to force the table to update - currenetly it doesn't until a hard refresh
+    }
+
+    async _updateTransaction(id, data) {
+        console.log('updating id: ' + id + ' with value: ' + JSON.stringify(data));
+            fetch('/transactions/' + id, {
+            method: 'POST',
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        });
+
     }
 
     render() {
@@ -114,6 +137,19 @@ class Transaction extends Component {
                                     Header: 'Notes',
                                     accessor: 'notes',
                                     Cell: this.renderEditable
+                                },
+                                {
+                                    Header: 'Type',
+                                    accessor: 'data.type',
+                                    Cell: row => (
+                                        <select id = { row.index } value = { row.value || '' } onChange = {this.handleTypeChange}  >
+                                            <option value="PLANNED">PLANNED</option>
+                                            <option value="ESTIMATE">ESTIMATE</option>
+                                            <option value="PENDING">PENDING</option>
+                                            <option value="CONFIRMED">CONFIRMED</option>
+                                            <option value=""></option>
+                                        </select>
+                                    )
                                 }
                             ]
                         }
