@@ -131,11 +131,17 @@ class Transaction extends Component {
                             else if (type === 'PENDING') {
                                 return { className: 'pendingTransactionRow'}
                             }
+                            else if (type === 'PLANNED') {
+                                return { className: 'plannedTransactionRow'}
+                            }
+                            else if (type === 'ESTIMATE') {
+                                return { className: 'estimateTransactionRow'}
+                            }
                         }
                         return { };
                     }}
                     defaultPageSize={10}
-                    className=""
+                    className="-highlight"
                 />
             </div>
         );

@@ -5,3 +5,11 @@
 .pendingTransactionRow {
     background-color: #FFF200
 }
+
+.estimateTransactionRow {
+    font-style: italic;
+}
+
+.plannedTransactionRow {
+    font-style: italic;
+}

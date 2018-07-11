@@ -42,8 +42,7 @@ class Importer {
                  */
                 let newTrans = {
                     'name' : values[0],
-                    'date' : new Date(values[4]),
-                    'notes' : values[5]
+                    'date' : new Date(values[4]).toJSON()
                 };
 
                 if (values[1]) {
@@ -53,8 +52,35 @@ class Importer {
                     newTrans['amount'] = parseInt(values[2]);
                 }
 
-                newTrans['date'] = new Date(values[4]).toJSON();
+                //Notes are a weird case because of how I've been using them.  There are a couple of special phrases to look for
+                let notesString = values[5];
+                let plannedLoc = notesString.indexOf('pln');
+                if (plannedLoc < 0) {
+                    plannedLoc = notesString.indexOf('planned');
+                }
 
+                let estLoc = notesString.indexOf('est');
+
+                if ((estLoc < 0) && (plannedLoc < 0)) {
+                    if (new Date(newTrans.date) < Date.now()) {
+                        //no relvalent notes and in the past
+                        newTrans['type'] = 'CONFIRMED';
+                    }
+                    else {
+                        _logger.debug(newTrans.date + ' is not before ' + Date.now());
+                    }
+                }
+                else {
+                    if (estLoc < 0) {
+                        _logger.debug('found an estimate');
+                        newTrans['type'] = 'ESTIMATE';
+                    }
+                    if (plannedLoc < 0) {
+                        _logger.debug('found a planned');
+                        newTrans['type'] = 'PLANNED';
+                    }
+                }
+                newTrans['notes'] = notesString;
                 //_logger.debug('built the transaction: %j', newTrans);
 
                 //make sure its valid
