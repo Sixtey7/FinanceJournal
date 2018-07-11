@@ -3,7 +3,11 @@ let router = express.Router();
 let Ajv = require('ajv');
 let Pool = require('pg-pool');
 
+const Importer = require('../utils/importer');
+const TransHelper = require('../utils/TransHelper');
+
 let _logger = require('../config/logger')('TransactionDB', false);
+let _transHelper = new TransHelper();
 
 let ajv = new Ajv({allErrors: true, "format" : "full"});
 
@@ -128,6 +132,29 @@ router.post('/:transId', function(req, res, next) {
         _logger.warn('input provided failed validation with error %s', errorText);
         res.status(400).send(errorText);
     }
+});
+router.put('/import', function(req, res, next) {
+    _logger.debug('running the import!');
+
+    let importer = new Importer();
+
+    (async () => {
+    
+        let result = await importer.createTransactionsFromCSV(req.body);
+
+        //_logger.debug('got the result %j', result);
+
+        _transHelper.insertAllIntoDatabase(result);
+
+        res.status(200).send();
+    })().catch(e => {
+        _logger.error(e.message);
+        _logger.error(e.stack);
+        res.status(500).send(e.message);  
+    });
+    //res.status(200).send();
+
+
 });
 
 module.exports = router;
