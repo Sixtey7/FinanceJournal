@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import ReactTable from 'react-table';
+import './Transaction.css'
 import 'react-table/react-table.css';
 
 class Transaction extends Component {
@@ -23,7 +24,6 @@ class Transaction extends Component {
     renderEditable(cellInfo) {
         return (
             <div 
-                style={{ backgroundColor: '#fafafa' }}
                 contentEditable
                 suppressContentEditableWarning
                 onBlur={ e => {
@@ -72,10 +72,11 @@ class Transaction extends Component {
                                     Cell: row => (
                                         <span>
                                             {
-                                                row.value < 0 ? Math.abs(row.value) : ''
+                                                row.value < 0 ? '$' + Math.abs(row.value).toFixed(2) : ''
                                             }
                                         </span>
-                                    )
+                                    ),
+                                    maxWidth: 125
                                 },
                                 {
                                     Header: 'Credit',
@@ -83,14 +84,16 @@ class Transaction extends Component {
                                     Cell: row => (
                                         <span>
                                             {
-                                                row.value > 0 ? row.value : ''
+                                                row.value > 0 ? '$' + row.value.toFixed(2) : ''
                                             }
                                         </span>
-                                    )
+                                    ),
+                                    maxWidth: 125
                                 },
                                 {
                                     Header: 'Total',
-                                    accessor: 'total'
+                                    accessor: 'total',
+                                    maxWidth: 150
                                 }
                             ]
                         },
@@ -99,11 +102,13 @@ class Transaction extends Component {
                             columns: [
                                 {
                                     Header: 'Date',
-                                    accessor: 'data.date'
-                                },
-                                {
-                                    Header: 'Type',
-                                    accessor: 'data.type'
+                                    accessor: 'data.date',
+                                    Cell: row => (
+                                        <span>
+                                            { (new Date(row.value)).toLocaleDateString() }
+                                        </span>
+                                    ),
+                                    maxWidth: 125
                                 },
                                 {
                                     Header: 'Notes',
@@ -114,8 +119,23 @@ class Transaction extends Component {
                         }
 
                     ]}
+                    getTrProps={(state, rowInfo) => {
+                        if (rowInfo) {
+                            console.log(rowInfo);
+                            let type = this.state.transactions[rowInfo.index].data.type;
+                            //NOTE: to remove the padded look, add this to the return statement:
+                                //, style: { border: '1px solid black', margin: '0px'}
+                            if (type === 'CONFIRMED') {
+                                return { className: 'confirmedTransactionRow'}
+                            }
+                            else if (type === 'PENDING') {
+                                return { className: 'pendingTransactionRow'}
+                            }
+                        }
+                        return { };
+                    }}
                     defaultPageSize={10}
-                    className="-striped -highlight"
+                    className=""
                 />
             </div>
         );
