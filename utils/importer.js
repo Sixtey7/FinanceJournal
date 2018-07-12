@@ -46,10 +46,10 @@ class Importer {
                 };
 
                 if (values[1]) {
-                    newTrans['amount'] = parseInt(-1 * values[1]);
+                    newTrans['amount'] = parseFloat(-1 * values[1]);
                 }
                 else {
-                    newTrans['amount'] = parseInt(values[2]);
+                    newTrans['amount'] = parseFloat(values[2]);
                 }
 
                 //Notes are a weird case because of how I've been using them.  There are a couple of special phrases to look for
