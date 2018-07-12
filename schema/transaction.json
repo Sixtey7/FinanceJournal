@@ -6,7 +6,7 @@
         "name" : {"type" : "string"},
         "date" : {"type" : "string", "format":"date-time"},
         "amount" : {"type" : "number"},
-        "type" : {"type" : "string", "enum": ["PLANNED", "ESTIMATE", "PENDING", "CONFIRMED"]},
+        "type" : {"type" : "string", "enum": ["PLANNED", "ESTIMATE", "PENDING", "CONFIRMED", "FUTURE"]},
         "notes" : {"type" : "string"}
     },
     "required": ["name","date", "amount"]   

@@ -144,9 +144,9 @@ router.delete('/:transId', function(req, res, next) {
         var client = await pool.connect();
 
         try {
-            let result = await client.query('DELETE FROM ' + TABLE_NAME + ' where id = $1', [req.param.transId]);
+            let result = await client.query('DELETE FROM ' + TABLE_NAME + ' where id = $1', [req.params.transId]);
             _logger.debug('Got the result %j', result);
-            res.status(200).send();
+            res.status(200).send(result.rowCount);
         }
         finally {
             client.release();

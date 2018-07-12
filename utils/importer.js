@@ -68,6 +68,7 @@ class Importer {
                     }
                     else {
                         _logger.debug(newTrans.date + ' is not before ' + Date.now());
+                        newTrans['type'] = 'FUTURE';
                     }
                 }
                 else {

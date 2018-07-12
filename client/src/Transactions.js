@@ -11,6 +11,7 @@ class Transaction extends Component {
         this.renderEditable = this.renderEditable.bind(this);
         this.handleTypeChange = this.handleTypeChange.bind(this);
         this.renderAmountEditable = this.renderAmountEditable.bind(this);
+        this.handleDelete = this.handleDelete.bind(this);
     }
 
     componentDidMount() {
@@ -120,6 +121,21 @@ class Transaction extends Component {
         this.setState( { transactions: allTrans });
     }
 
+    handleDelete(event) {
+        console.log('delete selected for ' + this.state.transactions[event.target.id]['data']['name']);
+
+        let allTrans = this.state.transactions;
+
+        //tell the backend about the deletion
+        this._deleteTransaction(allTrans[event.target.id]['id']);
+
+        //update the state to remove the item
+        delete allTrans[event.target.id];
+
+        this.massageDataset(allTrans);
+        this.setState({ transactions: allTrans });
+    }
+
     massageDataset(dataset) {
 
         let currentBalance = 0;
@@ -128,7 +144,6 @@ class Transaction extends Component {
             currentBalance = currentBalance += thisTrans.data.amount;
             thisTrans['total'] = currentBalance;
         }
-
 
         return dataset;
     }
@@ -144,6 +159,15 @@ class Transaction extends Component {
             body: JSON.stringify(data)
         });
 
+    }
+
+    async _deleteTransaction(id) {
+        console.log('deleting id: ' + id);
+        fetch('/transactions/' + id, {
+            method: 'DELETE',
+        });
+
+        //TODO: should check the result and make sure a 1 was returned
     }
 
     render() {
@@ -214,14 +238,25 @@ class Transaction extends Component {
                                     accessor: 'data.type',
                                     Cell: row => (
                                         <select id = { row.index } value = { row.value || '' } onChange = {this.handleTypeChange}  >
-                                            <option value=""></option>
+                                            <option value="FUTURE">FUTURE</option>
                                             <option value="PLANNED">PLANNED</option>
                                             <option value="ESTIMATE">ESTIMATE</option>
                                             <option value="PENDING">PENDING</option>
                                             <option value="CONFIRMED">CONFIRMED</option>
                                         </select>
-                                    )
-                                }
+                                    ),
+                                    maxWidth: 125
+                                },
+                                {
+                                    Header: 'D',
+                                    id: 'deleteRow',
+                                    Cell: row => (
+                                        <div>
+                                            <button onClick={this.handleDelete} id = { row.index }>D</button>
+                                        </div>
+                                    ),
+                                    maxWidth: 40
+                                } 
                             ]
                         }
 
@@ -233,21 +268,28 @@ class Transaction extends Component {
                             //NOTE: to remove the padded look, add this to the return statement:
                                 //, style: { border: '1px solid black', margin: '0px'}
                             if (type === 'CONFIRMED') {
-                                return { className: 'confirmedTransactionRow'}
+                                return { className: 'confirmedTransactionRow' }
                             }
                             else if (type === 'PENDING') {
-                                return { className: 'pendingTransactionRow'}
+                                return { className: 'pendingTransactionRow' }
                             }
                             else if (type === 'PLANNED') {
-                                return { className: 'plannedTransactionRow'}
+                                return { className: 'plannedTransactionRow' }
                             }
                             else if (type === 'ESTIMATE') {
-                                return { className: 'estimateTransactionRow'}
+                                return { className: 'estimateTransactionRow' }
+                            }
+                            else if (type === 'FUTURE') {
+                                return { className: 'futureTransactionRow' }
                             }
                         }
                         return { };
                     }}
-                    defaultPageSize={10}
+                    defaultPageSize={75}
+                    minRows={0}
+                    showPaginationTop = { true }
+                    pageSizeOptions = { [5, 10, 20, 25, 50, 75, 100, 1000] }
+                    page = { Math.floor(this.state.transactions.length / 75) }
                     className="-highlight"
                 />
             </div>
