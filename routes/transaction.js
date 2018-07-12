@@ -133,6 +133,55 @@ router.post('/:transId', function(req, res, next) {
         res.status(400).send(errorText);
     }
 });
+
+/**
+ * Delete the transaction specified by transId from the database
+ */
+router.delete('/:transId', function(req, res, next) {
+    _logger.debug('Got a request to delete transaction %d', req.params.transId);
+
+    (async () => {
+        var client = await pool.connect();
+
+        try {
+            let result = await client.query('DELETE FROM ' + TABLE_NAME + ' where id = $1', [req.param.transId]);
+            _logger.debug('Got the result %j', result);
+            res.status(200).send();
+        }
+        finally {
+            client.release();
+        }
+    })().catch(e => {
+        _logger.error(e.message);
+        _logger.error(e.stack);
+        res.status(500).send(e.message);
+    });
+});
+
+/**
+ * Delete all of the transactionsfromthe database
+ * Note: just havinga delete request to / might make more sense, but seemed too easy to hit by accident
+ */
+router.delete('/delete/all', function(req, res, next) {
+    _logger.debug('Got a request to delete all of the transactions from the database');
+
+    (async () => {
+        var client = await pool.connect();
+
+        try {
+            let result = await client.query('DELETE FROM ' + TABLE_NAME);
+            _logger.debug('Got the result %j', result);
+            res.status(200).send(result.rowCount + '');
+        }
+        finally { 
+            client.release();
+        }
+    })().catch(e =>{
+        _logger.error(e.message);
+        _logger.error(e.stack);
+        res.status(500).send(e.message);
+    })
+});
 router.put('/import', function(req, res, next) {
     _logger.debug('running the import!');
 
@@ -144,7 +193,7 @@ router.put('/import', function(req, res, next) {
 
         //_logger.debug('got the result %j', result);
 
-        _transHelper.insertAllIntoDatabase(result);
+        await _transHelper.insertAllIntoDatabase(result);
 
         res.status(200).send();
     })().catch(e => {

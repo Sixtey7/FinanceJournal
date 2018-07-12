@@ -48,7 +48,6 @@ class Transaction extends Component {
     }
 
     renderAmountEditable(cellInfo) {
-        //TODO Gotta handle the case where the debit or credit cells are edited, those need special attention
         return (
             <div
                 contentEditable
@@ -59,7 +58,7 @@ class Transaction extends Component {
                     const transaction = allTrans[cellInfo.index];
                     if (e.target.innerHTML) {
                         console.log('This was in the cell -' + e.target.innerHTML + '-');
-                        //need to strip off the leading $
+                        //may need to strip off the leading $
                         let value = 0;
                         if (e.target.innerHTML.charAt(0) === '$') {
                             value = parseFloat(e.target.innerHTML.substr(1));
@@ -95,6 +94,11 @@ class Transaction extends Component {
         );
     }
 
+    /**
+     * Helper method that is used to determine whether or not the amount should be put into a debit/credit cell
+     * @param {*string} cellName - the name of the cell that is being updated
+     * @param {*float} value - the value that could be put into the cell 
+     */
     _determineAmount(cellName, value) {
         console.log('running determineAmount for cellName ' + cellName + ' and value: ' + value);
         if ((cellName === 'Credit' && value > 0) || (cellName === 'Debit' && value < 0)) {
