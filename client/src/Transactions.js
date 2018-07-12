@@ -10,6 +10,7 @@ class Transaction extends Component {
         super();
         this.renderEditable = this.renderEditable.bind(this);
         this.handleTypeChange = this.handleTypeChange.bind(this);
+        this.renderAmountEditable = this.renderAmountEditable.bind(this);
     }
 
     componentDidMount() {
@@ -19,6 +20,7 @@ class Transaction extends Component {
             .then(transactions => transactions.sort(function(a, b){ 
                 return (new Date(a.data.date)) - (new Date(b.data.date))
             }))
+            .then(transactions => this.massageDataset(transactions))
             .then(transactions => this.setState({ transactions }));
     }
 
@@ -47,14 +49,84 @@ class Transaction extends Component {
 
     renderAmountEditable(cellInfo) {
         //TODO Gotta handle the case where the debit or credit cells are edited, those need special attention
+        return (
+            <div
+                contentEditable
+                suppressContentEditableWarning
+                onBlur={ e => {
+                    console.log('running on blur in amount!');
+                    let allTrans = this.state.transactions;
+                    const transaction = allTrans[cellInfo.index];
+                    if (e.target.innerHTML) {
+                        console.log('This was in the cell -' + e.target.innerHTML + '-');
+                        //need to strip off the leading $
+                        let value = 0;
+                        if (e.target.innerHTML.charAt(0) === '$') {
+                            value = parseFloat(e.target.innerHTML.substr(1));
+                        }
+                        else {
+                            value = parseFloat(e.target.innerHTML);
+                        }
+
+                        //there is data in the cell, we need to update amount
+                        let amount = 0;
+                        if (cellInfo.column.Header === 'Debit') {
+                            amount = -1 * value;
+                        }
+                        else {
+                            amount = value
+                        }
+
+
+                        transaction['data']['amount'] = amount;
+                        this._updateTransaction(transaction['id'], transaction['data']);
+                    }
+                    else {
+                        console.log('cell was empty - blank out the value');
+                        transaction['data']['amount'] = 0;
+                        this._updateTransaction(transaction['id'], transaction['data']);
+                    }
+
+                    this.massageDataset(allTrans);
+                    this.setState( { transactions: allTrans });
+                }}
+                dangerouslySetInnerHTML= {this._determineAmount(cellInfo.column.Header, this.state.transactions[cellInfo.index]['data']['amount'])}
+            />
+        );
+    }
+
+    _determineAmount(cellName, value) {
+        console.log('running determineAmount for cellName ' + cellName + ' and value: ' + value);
+        if ((cellName === 'Credit' && value > 0) || (cellName === 'Debit' && value < 0)) {
+            return { __html: '$' + Math.abs(value).toFixed(2)}
+        }
+        else {
+            return { __html: ''}
+        }
     }
 
     handleTypeChange(event) {
         console.log('Transaction: ' + this.state.transactions[event.target.id]['data']['name'] + ' was change to: ' + event.target.value);
-        this.state.transactions[event.target.id]['data']['type'] = event.target.value;
-        this._updateTransaction(this.state.transactions[event.target.id]['id'], this.state.transactions[event.target.id]['data']);
 
-        //TODO: This needs to force the table to update - currenetly it doesn't until a hard refresh
+        //copy out the array, modify it, and then reset the state - this will tell react to update the display
+        let allTrans = this.state.transactions;
+        allTrans[event.target.id]['data']['type'] = event.target.value;
+        this._updateTransaction(allTrans[event.target.id]['id'], allTrans[event.target.id]['data']);
+
+        this.setState( { transactions: allTrans });
+    }
+
+    massageDataset(dataset) {
+
+        let currentBalance = 0;
+        for (let thisTransId in dataset) {
+            let thisTrans = dataset[thisTransId];
+            currentBalance = currentBalance += thisTrans.data.amount;
+            thisTrans['total'] = currentBalance;
+        }
+
+
+        return dataset;
     }
 
     async _updateTransaction(id, data) {
@@ -92,30 +164,25 @@ class Transaction extends Component {
                                 {
                                     Header: 'Debit',
                                     accessor: 'data.amount',
-                                    Cell: row => (
-                                        <span>
-                                            {
-                                                row.value < 0 ? '$' + Math.abs(row.value).toFixed(2) : ''
-                                            }
-                                        </span>
-                                    ),
+                                    Cell: this.renderAmountEditable,
                                     maxWidth: 125
                                 },
                                 {
                                     Header: 'Credit',
                                     accessor: 'data.amount',
-                                    Cell: row => (
-                                        <span>
-                                            {
-                                                row.value > 0 ? '$' + row.value.toFixed(2) : ''
-                                            }
-                                        </span>
-                                    ),
+                                    Cell: this.renderAmountEditable,
                                     maxWidth: 125
                                 },
                                 {
                                     Header: 'Total',
                                     accessor: 'total',
+                                    Cell: row => (
+                                        <span>
+                                            {
+                                                '$' + row.value.toFixed(2)
+                                            }
+                                        </span>
+                                    ),
                                     maxWidth: 150
                                 }
                             ]
@@ -143,11 +210,11 @@ class Transaction extends Component {
                                     accessor: 'data.type',
                                     Cell: row => (
                                         <select id = { row.index } value = { row.value || '' } onChange = {this.handleTypeChange}  >
+                                            <option value=""></option>
                                             <option value="PLANNED">PLANNED</option>
                                             <option value="ESTIMATE">ESTIMATE</option>
                                             <option value="PENDING">PENDING</option>
                                             <option value="CONFIRMED">CONFIRMED</option>
-                                            <option value=""></option>
                                         </select>
                                     )
                                 }
@@ -157,7 +224,7 @@ class Transaction extends Component {
                     ]}
                     getTrProps={(state, rowInfo) => {
                         if (rowInfo) {
-                            console.log(rowInfo);
+                            //console.log(rowInfo);
                             let type = this.state.transactions[rowInfo.index].data.type;
                             //NOTE: to remove the padded look, add this to the return statement:
                                 //, style: { border: '1px solid black', margin: '0px'}

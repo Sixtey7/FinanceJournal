@@ -38,7 +38,7 @@ router.get('/', function (req, res, next) {
         try {
             _logger.debug('running the query!');
             let result = await client.query('select * from ' + TABLE_NAME );
-            _logger.debug('Got the result: %j', result.rows);
+            //_logger.debug('Got the result: %j', result.rows);
             res.status(200).send(result.rows);
         }
         finally {
