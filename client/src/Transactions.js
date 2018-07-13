@@ -23,6 +23,10 @@ class Transaction extends Component {
             }))
             .then(transactions => this.massageDataset(transactions))
             .then(transactions => this.setState({ transactions }));
+
+            //TODO: set the default page here and see if that works as expected 
+            //                    page = { Math.floor(this.state.transactions.length / 75) }
+
     }
 
     renderEditable(cellInfo) {
@@ -205,7 +209,7 @@ class Transaction extends Component {
                                     Header: 'Total',
                                     accessor: 'total',
                                     Cell: row => (
-                                        <span>
+                                        <span class = {row.value < 2500 ? 'bad-balance' : '' }>
                                             {
                                                 '$' + row.value.toFixed(2)
                                             }
@@ -289,7 +293,6 @@ class Transaction extends Component {
                     minRows={0}
                     showPaginationTop = { true }
                     pageSizeOptions = { [5, 10, 20, 25, 50, 75, 100, 1000] }
-                    page = { Math.floor(this.state.transactions.length / 75) }
                     className="-highlight"
                 />
             </div>

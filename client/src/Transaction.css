@@ -17,3 +17,7 @@
 .ReactTable.-highlight .rt-tbody .rt-tr:not(.-padRow):hover {
     background: #ED7D31 !important;
 }
+
+.bad-balance {
+    background-color: rgb(237, 50, 100);
+}
