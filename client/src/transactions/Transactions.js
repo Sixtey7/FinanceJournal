@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import ReactTable from 'react-table';
-import './Transaction.css'
+import './Transactions.css'
 import 'react-table/react-table.css';
 
 class Transaction extends Component {
