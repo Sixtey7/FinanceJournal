@@ -1,0 +1,23 @@
+.confirmedTransactionRow {
+    background-color: #00b050;
+}
+
+.pendingTransactionRow {
+    background-color: #FFF200
+}
+
+.estimateTransactionRow {
+    font-style: italic;
+}
+
+.plannedTransactionRow {
+    font-style: italic;
+}
+
+.ReactTable.-highlight .rt-tbody .rt-tr:not(.-padRow):hover {
+    background: #ED7D31 !important;
+}
+
+.bad-balance {
+    background-color: rgb(237, 50, 100);
+}

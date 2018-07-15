@@ -1,23 +1,16 @@
-.confirmedTransactionRow {
-    background-color: #00b050;
+.headerBar {
+    background-color: #000;
+    position: fixed; /* Set the navbar to fixed position */
+    top: 0; /* Position the navbar at the top of the page */
+    width: 100%; /* Full width */
+    z-index:30;
+    height: 60px;
 }
 
-.pendingTransactionRow {
-    background-color: #FFF200
+.headerBar h1 {
+    color: white;
 }
 
-.estimateTransactionRow {
-    font-style: italic;
-}
-
-.plannedTransactionRow {
-    font-style: italic;
-}
-
-.ReactTable.-highlight .rt-tbody .rt-tr:not(.-padRow):hover {
-    background: #ED7D31 !important;
-}
-
-.bad-balance {
-    background-color: rgb(237, 50, 100);
+.mainPanel {
+    margin-top:60px;
 }
