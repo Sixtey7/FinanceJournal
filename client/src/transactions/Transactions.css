@@ -1,16 +1,25 @@
 .headerBar {
-    background-color: #FFF;
+    background-color: #0C0C0C;
     position: fixed; /* Set the navbar to fixed position */
     top: 0; /* Position the navbar at the top of the page */
     width: 100%; /* Full width */
     z-index:30;
-    height: 100px;
+    height: 60px;
 }
 
 .headerBar h1 {
-    color: white;
+    color: #FFF;
+    float: left;
+    margin-left: 25px;
+    margin-top: 10px;
 }
 
 .mainPanel {
     margin-top:60px;
+}
+
+.newTransButton {
+    float: right;
+    margin-right: 25px;
+    margin-top: 10px;
 }

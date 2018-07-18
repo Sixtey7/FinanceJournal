@@ -4,6 +4,7 @@ import TransactionsTable from './TransactionsTable';
 import './Transactions.css';
 import NewTransactionForm from './NewTransactionForm';
 import { Form, Button } from 'antd';
+import 'antd/dist/antd.css';
 
 class Transactions extends Component {
 
@@ -45,7 +46,7 @@ class Transactions extends Component {
                 <div className="headerBar">
                     <h1>Transactions</h1>
                     <div>
-                        <Button onClick={this.showModal}>Add</Button>
+                        <Button className="btn btn-default newTransButton" onClick={this.showModal}>Add</Button>
                         <NewTransForm
                             formvisible = {this.state.formvisible}
                             onCancel = {this.handleCancel}
