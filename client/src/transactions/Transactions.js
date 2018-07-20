@@ -26,6 +26,7 @@ class Transactions extends Component {
         const form = this.form;
         //do validation here
 
+        console.log(JSON.stringify(form));
         form.resetFields();
         this.setState({ formvisible: false });
     }
