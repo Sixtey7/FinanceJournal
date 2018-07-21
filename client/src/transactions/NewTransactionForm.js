@@ -1,29 +1,21 @@
 import React, { Component } from 'react';
-import { Modal, Form, Input, DatePicker } from 'antd';
+import { Modal, Form, Input, DatePicker, Select } from 'antd';
+
+const Option = Select.Option;
 
 class NewTransactionForm extends Component {
-    constructor(props) {
-        super(props);
-    
-    this.state = {
-        amount: 0
-    };
-    }
-    handleAmountChange = (amount) => {
-        const number = parseInt(amount.target.value || 0, 10);
-        console.log('number was: ' + number);
-        if (isNaN(number)) {
-            console.log('returning!');
-            this.props.form.setFieldsValue({amount: 'peaches'});
+    validateAmount = (rule, value, callback) => {
+        if (isNaN(value)) {
+            callback('Please enter a valid number!');
             return;
         }
-        else {
-            this.setState({number});
-        }
+        
+        callback();
     }
+
     render() {
         const { formvisible, onCancel, onCreate, form } = this.props;
-        const { getFieldDecorator } = this.props.form;
+        const { getFieldDecorator } = form;
         const FormItem = Form.Item;
 
         const formItemLayout = {
@@ -41,8 +33,6 @@ class NewTransactionForm extends Component {
             rules: [{ type: 'object', required: true, message: 'Please select time!' }],
         };
 
-        const state = this.state;
-            
         return (
             <Modal
                 visible={formvisible}
@@ -56,21 +46,39 @@ class NewTransactionForm extends Component {
                     <FormItem label="Title"
                         {...formItemLayout}
                     >
-                        {getFieldDecorator('title')(<Input  placeholder="title"/>)}
+                        {getFieldDecorator('title', {
+                            rules: [{ required: true, message: 'Please enter a title!', whitespace: true }]
+                        })(<Input  placeholder="title"/>)}
                     </FormItem>
                     <FormItem label="Amount"
                         {...formItemLayout}
                     >
-                        {getFieldDecorator('amount')(<Input 
-                            type="text"
-                            onChange={this.handleAmountChange}/>)}
+                        {getFieldDecorator('amount', {
+                            rules: [{required: true, message: 'Please enter an amount!', whitespace: true}, { validator: this.validateAmount}]
+                        })(<Input type="text"/>)}
+                    </FormItem>
+                    <FormItem label="Type"
+                        {...formItemLayout}
+                    >
+                        {getFieldDecorator('type')(<Select>
+                            <Option value="future">Future</Option>
+                            <Option value="planned">Planned</Option>
+                            <Option value="estimate">Estimate</Option>
+                            <Option value="pending">Pending</Option>
+                            <Option value="confirmed">Confirmed</Option>
+                        </Select>)}
                     </FormItem>
                     <FormItem label="Trans Date"
                         {...formItemLayout}
                     >
-                        {getFieldDecorator('date-picker', config)(
+                        {getFieldDecorator('date', config)(
                             <DatePicker />
                         )}
+                    </FormItem>
+                    <FormItem label="Notes"
+                        {...formItemLayout}
+                    >
+                        {getFieldDecorator('notes')(<Input type="textarea"/>)}
                     </FormItem>
                 </Form>
             </Modal>

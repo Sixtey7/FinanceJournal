@@ -27,6 +27,13 @@ class TransactionsTable extends Component {
             //TODO: set the default page here and see if that works as expected 
             //                    page = { Math.floor(this.state.transactions.length / 75) }
 
+            this.props.onRef(this)
+
+
+    }
+      
+    componentWillUnmount() {
+    this.props.onRef(undefined)
     }
 
     renderEditable(cellInfo) {
@@ -150,6 +157,17 @@ class TransactionsTable extends Component {
         }
 
         return dataset;
+    }
+
+    addTransToTable(newTrans) {
+        console.log('Got the trans: ' + JSON.stringify(newTrans));
+
+        let allTrans = this.state.transactions;
+
+        allTrans.push(newTrans);
+
+        this.massageDataset(allTrans);
+        this.setState({ transactions: allTrans });
     }
 
     async _updateTransaction(id, data) {

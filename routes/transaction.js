@@ -85,9 +85,9 @@ router.put('/', function(req, res, next) {
             try {
                 let findBiggestNumberResult = await client.query('SELECT MAX(id) FROM ' + TABLE_NAME);
                 _logger.debug('largest number %d', findBiggestNumberResult.rows[0].max);
-                let result = await client.query('INSERT INTO ' + TABLE_NAME + ' (id, data) VALUES ($1, $2)', [findBiggestNumberResult.rows[0].max + 1, req.body]);
-                _logger.debug('Got the result ' + result.rows[0]);
-                res.status(200).send();
+                let result = await client.query('INSERT INTO ' + TABLE_NAME + ' (id, data) VALUES ($1, $2) RETURNING id', [findBiggestNumberResult.rows[0].max + 1, req.body]);
+                _logger.debug('Got the result ' + JSON.stringify(result));
+                res.status(200).send(result.rows[0].id + '');
             }
             finally {
                 client.release();
@@ -146,7 +146,7 @@ router.delete('/:transId', function(req, res, next) {
         try {
             let result = await client.query('DELETE FROM ' + TABLE_NAME + ' where id = $1', [req.params.transId]);
             _logger.debug('Got the result %j', result);
-            res.status(200).send(result.rowCount);
+            res.status(200).send('' + result.rowCount);
         }
         finally {
             client.release();

@@ -22,16 +22,56 @@ class Transactions extends Component {
         });
     }
 
-    handleCreate = () => {
+    handleCreate = async () =>  {
         const form = this.form;
-        //do validation here
 
-        console.log(JSON.stringify(form));
+        let values = form.getForm().getFieldsValue();
+        console.log('Got the values: ' + JSON.stringify(values));
+        //perform some basic validation
+        if (isNaN(values.amount)) {
+            console.error('user provided an amount that is not a number!');
+            return;
+        }
+        if (!values.title || !values.type || !values.date) {
+            console.error('user didn\'t fill out all the required values!');
+            return;
+        }
+
+        //build the new transaction
+        let data = {
+            name: values.title,
+            date: new Date(values.date).toJSON(),
+            amount: parseInt(values.amount),
+            type: values.type.toUpperCase(),
+            notes: values.notes
+        }
+        
+        console.log('about to fetch');
+        //send the data to the backend
+        let result;
+        fetch('/transactions/', {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+            .then(res => res.json())
+            .then(res => {
+                let newTrans = {
+                    'id': parseInt(res),
+                    'data': data
+                }
+                this.transTable.addTransToTable(newTrans);
+            });
+        ;
+
         form.resetFields();
         this.setState({ formvisible: false });
     }
 
     handleCancel = ()  => {
+        this.form.resetFields();
         this.setState({ formvisible: false});
     }
 
@@ -58,7 +98,7 @@ class Transactions extends Component {
                 </div>
 
                 <div className="mainPanel">
-                    <TransactionsTable/>
+                    <TransactionsTable onRef={ref => (this.transTable = ref)}/>
                 </div>
             </div>
         );
