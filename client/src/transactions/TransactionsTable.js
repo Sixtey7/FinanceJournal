@@ -18,9 +18,7 @@ class TransactionsTable extends Component {
         //get the transaction data from the backend
         fetch('/transactions')
             .then(res => res.json())
-            .then(transactions => transactions.sort(function(a, b){ 
-                return (new Date(a.data.date)) - (new Date(b.data.date))
-            }))
+            .then(transactions => transactions.sort(this._sortTrans))
             .then(transactions => this.massageDataset(transactions))
             .then(transactions => this.setState({ transactions }));
 
@@ -106,6 +104,10 @@ class TransactionsTable extends Component {
         );
     }
 
+    _sortTrans(transA, transB) {
+        return (new Date(transA.data.date)) - (new Date(transB.data.date))
+    }
+
     /**
      * Helper method that is used to determine whether or not the amount should be put into a debit/credit cell
      * @param {*string} cellName - the name of the cell that is being updated
@@ -166,9 +168,7 @@ class TransactionsTable extends Component {
 
         allTrans.push(newTrans);
 
-        allTrans.sort(function(a, b){ 
-            return (new Date(a.data.date)) - (new Date(b.data.date))
-        });
+        allTrans.sort(this._sortTrans);
 
         this.massageDataset(allTrans);
         this.setState({ transactions: allTrans });
