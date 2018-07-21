@@ -105,7 +105,7 @@ class TransactionsTable extends Component {
      * @param {*float} value - the value that could be put into the cell 
      */
     _determineAmount(cellName, value) {
-        console.log('running determineAmount for cellName ' + cellName + ' and value: ' + value);
+        //console.log('running determineAmount for cellName ' + cellName + ' and value: ' + value);
         if ((cellName === 'Credit' && value > 0) || (cellName === 'Debit' && value < 0)) {
             return { __html: '$' + Math.abs(value).toFixed(2)}
         }
@@ -209,7 +209,7 @@ class TransactionsTable extends Component {
                                     Header: 'Total',
                                     accessor: 'total',
                                     Cell: row => (
-                                        <span class = {row.value < 2500 ? 'bad-balance' : '' }>
+                                        <span className = {row.value < 2500 ? 'bad-balance' : '' }>
                                             {
                                                 '$' + row.value.toFixed(2)
                                             }

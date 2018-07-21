@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import ReactDOM from 'react-dom';
+//import ReactDOM from 'react-dom';
 import TransactionsTable from './TransactionsTable';
 import './Transactions.css';
 import NewTransactionForm from './NewTransactionForm';
