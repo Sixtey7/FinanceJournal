@@ -41,14 +41,13 @@ class Transactions extends Component {
         let data = {
             name: values.title,
             date: new Date(values.date).toJSON(),
-            amount: parseInt(values.amount),
+            amount: parseInt(values.amount, 10),
             type: values.type.toUpperCase(),
             notes: values.notes
         }
         
         console.log('about to fetch');
         //send the data to the backend
-        let result;
         fetch('/transactions/', {
             method: 'PUT',
             headers: {
@@ -59,7 +58,7 @@ class Transactions extends Component {
             .then(res => res.json())
             .then(res => {
                 let newTrans = {
-                    'id': parseInt(res),
+                    'id': parseInt(res, 10),
                     'data': data
                 }
                 this.transTable.addTransToTable(newTrans);
