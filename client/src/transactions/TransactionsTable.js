@@ -166,6 +166,10 @@ class TransactionsTable extends Component {
 
         allTrans.push(newTrans);
 
+        allTrans.sort(function(a, b){ 
+            return (new Date(a.data.date)) - (new Date(b.data.date))
+        });
+
         this.massageDataset(allTrans);
         this.setState({ transactions: allTrans });
     }
