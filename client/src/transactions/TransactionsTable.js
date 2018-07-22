@@ -47,8 +47,6 @@ class TransactionsTable extends Component {
                     console.log('Set the property to: ' + JSON.stringify(transaction));
 
                     this._updateTransaction(transaction['id'], transaction['data']);
-
-                    //TODO if a debit or credit or date amount changes, need to do stuff
                 }}
                 dangerouslySetInnerHTML={{
                     __html: this.state.transactions[cellInfo.index]['data'][cellInfo.column.id]

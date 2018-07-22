@@ -60,7 +60,9 @@ class NewTransactionForm extends Component {
                     <FormItem label="Type"
                         {...formItemLayout}
                     >
-                        {getFieldDecorator('type')(<Select>
+                        {getFieldDecorator('type', {
+                            initialValue: "future"
+                        })(<Select>
                             <Option value="future">Future</Option>
                             <Option value="planned">Planned</Option>
                             <Option value="estimate">Estimate</Option>
