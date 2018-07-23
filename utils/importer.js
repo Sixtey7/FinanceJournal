@@ -8,7 +8,6 @@ class Importer {
         _logger.debug('building a new Importer!');
         this.ajv = new Ajv({allErrors: true, "format" : "full"});
         this.validator = this.ajv.compile(require('../schema/transaction.json'));
-        _logger.debug("finished constructor'")
     }
 
     async createTransactionsFromCSV(csvData) {
