@@ -31,9 +31,11 @@ class TransHelper {
             var client = await pool.connect();
             try {
                 let findBiggestNumberResult = await client.query('SELECT MAX(id) FROM ' + TABLE_NAME);
+                let newKey = findBiggestNumberResult.rows[0].max + 1;
                 //_logger.debug('largest number %d', findBiggestNumberResult.rows[0].max);
-                let result = await client.query('INSERT INTO ' + TABLE_NAME + ' (id, data) VALUES ($1, $2)', [findBiggestNumberResult.rows[0].max + 1, transToInsert]);
+                let result = await client.query('INSERT INTO ' + TABLE_NAME + ' (id, data) VALUES ($1, $2)', [newKey, transToInsert]);
                 //_logger.debug('Got the result ' + result.rows[0]);
+                return newKey;
             }
             finally {
                 client.release();
