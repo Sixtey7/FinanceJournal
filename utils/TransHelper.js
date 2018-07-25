@@ -48,9 +48,13 @@ class TransHelper {
     }
 
     async insertAllIntoDatabase(allTransToInsert) {
+        let allKeys = new Array();
         for (let thisTrans in allTransToInsert) {
-            await this.insertIntoDatabase(allTransToInsert[thisTrans]);
+            let newKey = await this.insertIntoDatabase(allTransToInsert[thisTrans]);
+            allKeys.push(newKey);
         }
+
+        return allKeys;
     };
 }
 
