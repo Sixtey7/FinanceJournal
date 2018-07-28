@@ -29,6 +29,24 @@ class AccountsTable extends Component {
 
     renderEditable(cellInfo) {
         return (
+            <div 
+                contentEditable
+                suppressContentEditableWarning
+                onBlur={ e => {
+                    const account = this.state.accounts[cellInfo.index];
+                    account['data'][cellInfo.column.id] = e.target.innerHTML;
+
+                    this._updateAccount(account['id'], account['data'])''
+                }}
+                dangerouslySetInnerHTML={{
+                    __html: this.state.accounts[cellInfo.index]['data'][cellInfo.column.id]
+                }}
+            />
+        );
+    }
+    
+    renderAmountEditable(cellInfo) {
+        return (
             <div
                 contentEditable
                 suppressContentEditableWarning
