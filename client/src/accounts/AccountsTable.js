@@ -34,9 +34,9 @@ class AccountsTable extends Component {
                 suppressContentEditableWarning
                 onBlur={ e => {
                     const account = this.state.accounts[cellInfo.index];
-                    account['data'][cellInfo.column.id] = e.target.innerHTML;
+                    account['data'][cellInfo.column.id] = e.target.innerText;
 
-                    this._updateAccount(account['id'], account['data'])''
+                    this._updateAccount(account['id'], account['data'])
                 }}
                 dangerouslySetInnerHTML={{
                     __html: this.state.accounts[cellInfo.index]['data'][cellInfo.column.id]

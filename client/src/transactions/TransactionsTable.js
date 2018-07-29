@@ -42,7 +42,7 @@ class TransactionsTable extends Component {
                 onBlur={ e => {
                     console.log('on blur running!');
                     const transaction = this.state.transactions[cellInfo.index];
-                    transaction['data'][cellInfo.column.id] = e.target.innerHTML;
+                    transaction['data'][cellInfo.column.id] = e.target.innerText;
 
                     console.log('Set the property to: ' + JSON.stringify(transaction));
 
