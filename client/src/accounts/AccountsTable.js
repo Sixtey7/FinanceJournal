@@ -83,7 +83,7 @@ class AccountsTable extends Component {
 
                     this.setState( { accounts: allAccounts });
                 }}
-                dangerouslySetInnerHTML={ this._determineAmmount(cellInfo.column.Header, this.state.accounts[cellInfo.index]['data']['amount'])}
+                dangerouslySetInnerHTML={ this._determineAmount(cellInfo.column.Header, this.state.accounts[cellInfo.index]['data']['amount'])}
             />
         );
     }
@@ -92,6 +92,16 @@ class AccountsTable extends Component {
 
     _sortAccounts(accountA, accountB) {
         return accountA.id - accountB.id;
+    }
+
+    //TODO: this could probably be pulled out to be generic, since its exactly the same between this and transtable
+    _determineAmount(cellName, value) {
+        if ((cellName === 'Credit' && value > 0) || (cellName === 'Debit' && value < 0)) {
+            return { __html: '$' + Math.abs(value).toFixed(2)}
+        }
+        else {
+            return { __html: '' }
+        }
     }
 
     async _updateAccount(id, data) {
