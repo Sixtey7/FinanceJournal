@@ -115,3 +115,5 @@ class AccountsTable extends Component {
         });
     }
 }
+
+export default AccountsTable
