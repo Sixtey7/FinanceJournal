@@ -114,6 +114,59 @@ class AccountsTable extends Component {
             body: JSON.stringify(data)
         });
     }
+
+    render() {
+        return (
+            <div>
+                <ReactTable
+                    data = { this.state.accounts }
+                    columns = {[
+                        {
+                            Header: 'Source',
+                            colummns: [
+                                {
+                                    Header: 'Name',
+                                    accessor: 'name',
+                                    Cell: this.renderEditable
+                                }
+                            ]
+                        },
+                        {
+                            Header: 'Finances',
+                            columns: [
+                                {
+                                    Header: 'Debit',
+                                    accessor: 'data.amount',
+                                    Cell: this.renderAmountEditable,
+                                    maxWidth: 125
+                                },
+                                {
+                                    Header: 'Credit',
+                                    accessor: 'data.amount',
+                                    Cell: this.renderAmountEditable,
+                                    maxWidth: 125
+                                }
+                            ]
+                        },
+                        {
+                            Header: 'Details',
+                            columns: [
+                                {
+                                    Header: 'Notes',
+                                    accessor: 'notes',
+                                    Cell: this.renderEditable
+                                }
+                            ]
+                        }
+                    ]}
+                    defaultPageSize={10}
+                    minRows={0}
+                    pageSizeOptions= { [5, 10, 20, 50]}
+                    className="-highlight"
+                />
+            </div>
+        );
+    }
 }
 
 export default AccountsTable
