@@ -8,5 +8,5 @@
         "notes" : {"type" : "string"},
         "dynamic": {"type": "boolean"}
     },
-    "required": ["name","date"]   
+    "required": ["name"]   
 }

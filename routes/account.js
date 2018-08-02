@@ -9,7 +9,7 @@ let _logger = require('../config/logger')('AccountDB');
 
 let ajv = new Ajv({allErrors: true, "format": "full"});
 
-let validator = ajv.compile(require('../schema/recurring.json'));
+let validator = ajv.compile(require('../schema/account.json'));
 
 let pool = new Pool({
     database: 'financejournal',
@@ -85,8 +85,11 @@ router.put('/', function(req, res, next) {
 
             try {
                 let findBiggestNumber = await client.query('SELECT MAX(id) FROM ' + TABLE_NAME);
-                let result = await client.query('INSERT INTO ' + TABLE_NAME + ' (id, data) VALUES ($1, $2)'[findBiggestNumber.rows[0].max + 1, req.body]);
+                let newKey = findBiggestNumber.rows[0].max + 1;
+                _logger.debug('determined the new key: ' + newKey);
+                let result = await client.query('INSERT INTO ' + TABLE_NAME + ' (id, data) VALUES ($1, $2)', [newKey, req.body]);
                 res.status(200).send();
+                return newKey;
             }
             finally {
                 client.release();

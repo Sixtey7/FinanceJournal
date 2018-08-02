@@ -10,7 +10,7 @@ class AccountsTable extends Component {
         super();
         this.renderEditable = this.renderEditable.bind(this);
         this.renderAmountEditable = this.renderAmountEditable.bind(this);
-        this.handleDelete = thi.handleDelete.bind(this);
+        //this.handleDelete = this.handleDelete.bind(this);
     }
 
     componentDidMount() {
@@ -20,11 +20,11 @@ class AccountsTable extends Component {
             .then(accounts => accounts.sort(this._sortAccounts))
             .then(accounts => this.setState( { accounts }));
 
-            this.props.onRef(this);
+       //     this.props.onRef(this);
     }
 
     componentWillUnmount() {
-        this.props.onRef(undefined);
+       // this.props.onRef(undefined);
     }
 
     renderEditable(cellInfo) {
@@ -123,7 +123,7 @@ class AccountsTable extends Component {
                     columns = {[
                         {
                             Header: 'Source',
-                            colummns: [
+                            columns: [
                                 {
                                     Header: 'Name',
                                     accessor: 'name',
