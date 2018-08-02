@@ -161,7 +161,8 @@ class AccountsTable extends Component {
                     ]}
                     defaultPageSize={10}
                     minRows={0}
-                    pageSizeOptions= { [5, 10, 20, 50]}
+                    showPaginationTop = { false }
+                    showPaginationBottom = { false }
                     className="-highlight"
                 />
             </div>
