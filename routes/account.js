@@ -36,7 +36,6 @@ router.get('/', function(req, res, next) {
         var client = await pool.connect();
         try {
             let result = await client.query('select * from ' + TABLE_NAME);
-            _logger.debug('Got the result %j', result.rows);
             res.status(200).send(result.rows);
         }
         finally {
@@ -118,7 +117,7 @@ router.post('/:accountId', function(req, res, next) {
             try {
                 let result = await client.query('UPDATE ' + TABLE_NAME + ' SET data = $2 WHERE id = $1', [req.params.accountId, req.body]);
                 _logger.debug('Got the result: %j', result);
-                res.status(200).send();
+                res.status(200).send(result.rowCount);
             }
             finally {
                 client.release();
