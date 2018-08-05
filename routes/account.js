@@ -58,7 +58,12 @@ router.get('/:accountId', function (req, res, next) {
         try {
             let result = await client.query('SELECT * FROM ' + TABLE_NAME + ' where id = $1', [req.params.accountId]);
             _logger.debug('Got the result %j', result.rows);
-            res.status(200).send(result.rows[0]);
+            if (result.rows) {
+                res.status(200).send(result.rows[0])
+            }
+            else {
+                res.status(200).send();
+            }
         }
         finally { 
             client.release();
