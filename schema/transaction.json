@@ -7,7 +7,8 @@
         "date" : {"type" : "string", "format":"date-time"},
         "amount" : {"type" : "number"},
         "type" : {"type" : "string", "enum": ["PLANNED", "ESTIMATE", "PENDING", "CONFIRMED", "FUTURE"]},
-        "notes" : {"type" : "string"}
+        "notes" : {"type" : "string"},
+        "accountId" : {"type" : "number"}
     },
-    "required": ["name","date", "amount"]   
+    "required": ["name","date", "amount", "accountId"]   
 }

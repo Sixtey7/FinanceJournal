@@ -4,6 +4,8 @@ import { Modal, Form, Input, DatePicker, Select } from 'antd';
 const Option = Select.Option;
 
 class NewTransactionForm extends Component {
+    accounts = [];
+    
     validateAmount = (rule, value, callback) => {
         if (isNaN(value)) {
             callback('Please enter a valid number!');
@@ -11,6 +13,16 @@ class NewTransactionForm extends Component {
         }
         
         callback();
+    }
+
+    constructor() {
+        super(); 
+        //need to get the list of accounts to populate the dropdown
+        fetch('/accounts')
+            .then(res => res.json())
+            .then(accounts => this.accounts = accounts)
+            .then(accounts => console.log(JSON.stringify(this.accounts)));
+
     }
 
     render() {
@@ -81,6 +93,15 @@ class NewTransactionForm extends Component {
                         {...formItemLayout}
                     >
                         {getFieldDecorator('notes')(<Input type="textarea"/>)}
+                    </FormItem>
+                    <FormItem label="Account"
+                        {...formItemLayout}
+                    >
+                    {getFieldDecorator('account', {
+                        rules: [{required: true, message: 'Please select an account to associate the transaaction with!', whitespace: true}]
+                    })(<Select>
+                            <Option value = "1">Account 1</Option>
+                        </Select>)}
                     </FormItem>
                 </Form>
             </Modal>

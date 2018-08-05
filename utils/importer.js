@@ -10,7 +10,7 @@ class Importer {
         this.validator = this.ajv.compile(require('../schema/transaction.json'));
     }
 
-    async createTransactionsFromCSV(csvData) {
+    async createTransactionsFromCSV(csvData, newAccountId) {
         _logger.debug('doing the thing!');   
 
         let returnArray = new Array();
@@ -41,7 +41,8 @@ class Importer {
                  */
                 let newTrans = {
                     'name' : values[0],
-                    'date' : new Date(values[4]).toJSON()
+                    'date' : new Date(values[4]).toJSON(),
+                    'accountId' : newAccountId
                 };
 
                 if (values[1]) {

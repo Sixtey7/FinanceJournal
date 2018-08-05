@@ -32,7 +32,7 @@ class Transactions extends Component {
             console.error('user provided an amount that is not a number!');
             return;
         }
-        if (!values.title || !values.type || !values.date) {
+        if (!values.title || !values.type || !values.date|| !values.account) {
             console.error('user didn\'t fill out all the required values!');
             return;
         }
@@ -43,8 +43,9 @@ class Transactions extends Component {
             date: new Date(values.date).toJSON(),
             amount: parseInt(values.amount, 10),
             type: values.type.toUpperCase(),
-            notes: values.notes
-        }
+            notes: values.notes,
+            accountId: parseInt(values.account, 10)
+        };
         
         console.log('about to fetch');
         //send the data to the backend
