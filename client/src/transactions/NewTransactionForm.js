@@ -4,7 +4,8 @@ import { Modal, Form, Input, DatePicker, Select } from 'antd';
 const Option = Select.Option;
 
 class NewTransactionForm extends Component {
-    accounts = [];
+    state = {accounts: []}
+
     
     validateAmount = (rule, value, callback) => {
         if (isNaN(value)) {
@@ -15,13 +16,13 @@ class NewTransactionForm extends Component {
         callback();
     }
 
-    constructor() {
-        super(); 
+    componentWillMount() {
+        //super(); 
         //need to get the list of accounts to populate the dropdown
         fetch('/accounts')
             .then(res => res.json())
-            .then(accounts => this.accounts = accounts)
-            .then(accounts => console.log(JSON.stringify(this.accounts)));
+            .then(accounts => this.setState({accounts}))
+            .then(accounts => console.log(JSON.stringify(this.allAccounts)));
 
     }
 
@@ -98,9 +99,11 @@ class NewTransactionForm extends Component {
                         {...formItemLayout}
                     >
                     {getFieldDecorator('account', {
-                        rules: [{required: true, message: 'Please select an account to associate the transaaction with!', whitespace: true}]
+                        rules: [{required: true, message: 'Please select an account to associate the transaaction with!', type: 'number', whitespace: true}]
                     })(<Select>
-                            <Option value = "1">Account 1</Option>
+                        {this.state.accounts.map(function(account) {
+                            return <Option value={account.id} key={account.id}>{account.data.name}</Option>
+                        })}
                         </Select>)}
                     </FormItem>
                 </Form>
