@@ -19,6 +19,8 @@ class TransHelper {
     async insertTrans(transToInsert) {
         if (this.validator(transToInsert)) {
             return await _transDb.insertIntoDatabase(transToInsert);
+
+            _accountHelper.determineAndUpdateDynamicAccount(transToInsert.data.accountId);
         }
         else {
             _logger.warn('Trans to be inserted failed validation with error %s', this.ajv.errorsText(this.validator.errors));
@@ -28,17 +30,22 @@ class TransHelper {
 
     async insertAllIntoDatabase(allTransToInsert) {
         let allKeys = new Array();
-        for (let thisTrans in allTransToInsert) {
-            let newKey = await this.insertTrans(allTransToInsert[thisTrans]);
-            allKeys.push(newKey);
+        if (allTransToInsert.length > 0) {
+            for (let thisTrans in allTransToInsert) {
+                let newKey = await this.insertTrans(allTransToInsert[thisTrans]);
+                allKeys.push(newKey);
+            }
+
+            _accountHelper.determineAndUpdateDynamicAccount(allTransToInsert[0].data.accountId);
         }
+
 
         return allKeys;
     };
 
     async updateTransaction(id, data) {
         if (this.validator(data)) {
-            _transDb.updateTransaction(id, data);
+            await _transDb.updateTransaction(id, data);
 
             //need to tell the account helper that it might need to update itself
             _accountHelper.determineAndUpdateDynamicAccount(data.accountId);            

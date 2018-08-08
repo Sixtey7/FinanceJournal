@@ -34,9 +34,10 @@ class AccountsTable extends Component {
                 suppressContentEditableWarning
                 onBlur={ e => {
                     const account = this.state.accounts[cellInfo.index];
-                    account['data'][cellInfo.column.id] = e.target.innerText;
-
-                    this._updateAccount(account['id'], account['data'])
+                    if (account['data'][cellInfo.column.id] !== e.target.innerText) {
+                        account['data'][cellInfo.column.id] = e.target.innerText;
+                        this._updateAccount(account['id'], account['data']);
+                    }
                 }}
                 dangerouslySetInnerHTML={{
                     __html: this.state.accounts[cellInfo.index]['data'][cellInfo.column.id]
@@ -46,46 +47,62 @@ class AccountsTable extends Component {
     }
     
     renderAmountEditable(cellInfo) {
-        return (
-            <div
-                contentEditable
-                suppressContentEditableWarning
-                onBlur={ e => {
-                    let allAccounts = this.state.accounts;
-                    const thisAccount = allAccounts[cellInfo.index];
-                    if (e.target.innerHTML) {
-                        //may need to strip off the leading $
-                        let value = 0;
-                        if (e.target.innerHTML.charAt(0) === '$') {
-                            value = parseFloat(e.target.innerHTML.substr(1));
+        let thisAccount = this.state.accounts[cellInfo.index];
+        if (thisAccount.data.dynamic === true) {
+            return (
+                <div
+                    dangerouslySetInnerHTML= { this._determineAmount(cellInfo.column.Header, this.state.accounts[cellInfo.index]['data']['amount'])}
+                />
+            )
+        }
+        else {
+            return (
+                <div
+                    contentEditable
+                    suppressContentEditableWarning
+                    onBlur={ e => {
+                        let allAccounts = this.state.accounts;
+                        const thisAccount = allAccounts[cellInfo.index];
+                        if (e.target.innerHTML) {
+                            //may need to strip off the leading $
+                            let value = 0;
+                            if (e.target.innerHTML.charAt(0) === '$') {
+                                value = parseFloat(e.target.innerHTML.substr(1));
+                            }
+                            else {
+                                value = parseFloat(e.target.innerHTML);
+                            }
+
+                            //there is data in the cell, we need to update amount
+                            let amount = 0;
+                            if (cellInfo.column.Header === 'Debit') {
+                                amount = -1 * value;
+                            }
+                            else {
+                                amount = value;
+                            }
+
+                            if (thisAccount['data']['amount'] !== amount) {
+                                thisAccount['data']['amount'] = amount;
+                                this._updateAccount(thisAccount['id'], thisAccount['data']);
+                            }
                         }
                         else {
-                            value = parseFloat(e.target.innerHTML);
+                            console.log('cell was empty - may need blank out the value!');
+                            //need to make sure that there was a value in the cell that was removed - not that the user clicked on an empty cell then clicked out
+                            if ((cellInfo.column.Header === 'Debit' && thisAccount.data.amount < 0) || (cellInfo.column.Header === 'Credit' && thisAccount.data.amount > 0)) {
+                                console.log('determined the value needed to be blanked out')
+                                thisAccount['data']['amount'] = 0;
+                                this._updateAccount(thisAccount['id'], thisAccount['data']);
+                            }
                         }
 
-                        //there is data in the cell, we need to update amount
-                        let amount = 0;
-                        if (cellInfo.column.Header === 'Debit') {
-                            amount = -1 * value;
-                        }
-                        else {
-                            amount = value;
-                        }
-
-                        thisAccount['data']['amount'] = amount;
-                        this._updateAccount(thisAccount['id'], thisAccount['data']);
-                    }
-                    else {
-                        console.log('cell was empty - blank out the value!');
-                        thisAccount['data']['amount'] = 0;
-                        this._updateAccount(thisAccount['id'], thisAccount['data']);
-                    }
-
-                    this.setState( { accounts: allAccounts });
-                }}
-                dangerouslySetInnerHTML={ this._determineAmount(cellInfo.column.Header, this.state.accounts[cellInfo.index]['data']['amount'])}
-            />
-        );
+                        this.setState( { accounts: allAccounts });
+                    }}
+                    dangerouslySetInnerHTML={ this._determineAmount(cellInfo.column.Header, this.state.accounts[cellInfo.index]['data']['amount'])}
+                />
+            );
+        }
     }
 
 
@@ -159,6 +176,17 @@ class AccountsTable extends Component {
                             ]
                         }
                     ]}
+                    getTrProps = {(state, rowInfo) => {
+                        if (rowInfo) {
+                            let dynamic = this.state.accounts[rowInfo.index].data.dynamic;
+                            if (dynamic) {
+                                return { className: 'dynamicAccountRow' }
+                            }
+                            else {
+                                return { className: 'standardAccountRow' }
+                            }
+                        }
+                    }}
                     defaultPageSize={10}
                     minRows={0}
                     showPaginationTop = { false }

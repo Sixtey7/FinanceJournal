@@ -2,12 +2,11 @@
 
 let _logger = require('../config/logger')('AccountsHelper');
 let Ajv = require('ajv');
-let PGHelper = require('./PGHelper');
 let TransDB = require('../db/TransDb');
-
-let pgHelper = new PGHelper();
+let AccountsDB = require('../db/AccountDb');
 
 let _transDb = new TransDB();
+let _accountDb = new AccountsDB();
 
 class AccountsHelper {
     constructor() {
@@ -18,26 +17,7 @@ class AccountsHelper {
 
     async insertAccountIntoDatabase(accountToInsert) {
         if (this.validator(accountToInsert)) {
-            var client = await pgHelper.getPool().connect();
-            try {
-                let findBiggestNumberResult = await client.query('SELECT MAX(id) FROM ' + pgHelper.getAccountsTableName());
-                let newKey = 0;
-                if (findBiggestNumberResult.rows[0]) {
-                    newKey = findBiggestNumberResult.rows[0].max + 1;
-                }
-
-                _logger.debug('found the new account id: ' + newKey);
-
-                let result = await client.query('INSERT INTO ' + pgHelper.getAccountsTableName() + ' (id, data) VALUES ($1, $2)', [newKey, accountToInsert]);
-
-                return newKey;
-            }
-            catch (e) {
-                _logger.error(e);
-            }
-            finally {
-                client.release();
-            }
+            return await _accountDb.insertAccountIntoDatabase(accountToInsert);
         }
         else {
             _logger.warn('Account to be inserted failed validation with error %s', this.ajv.errorsText(this.validator.errors));
@@ -45,18 +25,25 @@ class AccountsHelper {
         }
     }
 
+    async updateAccount(id, accountToUpdate) {
+        if (this.validator(accountToUpdate)) {
+            return await _accountDb.updateAccount(id, accountToUpdate);
+        }
+        else {
+            _logger.warn('ACcount to be updated failed validation with error %s', this.ajv.errorsText(this.validator.errors));
+            throw new Error('Account failed validation!');
+        }
+    };
+
     async determineAndUpdateDynamicAccount(accountId) {
         //first, determine if we are dealing with a dynamic account
-        var client = await pgHelper.getPool().connect();
         try {
-            let accountDbResult = await client.query('SELECT * FROM ' + pgHelper.getAccountsTableName() + ' where id = $1', [accountId]);
+            let accountToVerify = await _accountDb.getAccount(accountId);
             
-            if (accountDbResult.rows && accountDbResult.rows.length > 0) {
-                let accountToVerify = accountDbResult.rows[0].data;
-                
-                if (accountToVerify.dynamic) {
+            if (accountToVerify) {                
+                if (accountToVerify.data.dynamic) {
                     _logger.debug('Determined account: ' + accountId + ' is dynamic!');
-                    this.updateDynamicAccount(accountId);
+                    this.updateDynamicAccount(accountToVerify);
                 }
                 else { 
                     _logger.debug('Determine account ' + accountId + ' is not dynamic');
@@ -70,26 +57,28 @@ class AccountsHelper {
         catch(e) {
             _logger.error(e.message, e.stack);
         }
-        finally {
-            client.release();
-        }
     }
 
     /**
-     * 
+     * Recaulate the total for an account
+     * NOTE: This could probably be smarter, where it caches values at a certain point, but, for now it just redoes the entire math
      * @param {number} accountId - the id of the account to update 
      */
-    async updateDynamicAccount(accountId) {
-        let allAccounts = await _transDb.getTransactionsForAccount(accountId);
+    async updateDynamicAccount(accountToUpdate) {
+        let allAccounts = await _transDb.getTransactionsForAccount(accountToUpdate.id);
         _logger.debug('found %d transactions for the account that need updating!', allAccounts.length);
         //start building the total
         let total = 0;
-        allAccounts.foreach(function(thisTrans) {
-
+        allAccounts.forEach(function(thisTrans) {
+            total += thisTrans.data.amount;
         });
 
-        _logger.debug('build the total: %d', total);
+        total = total.toFixed(2);
+        _logger.debug('build the total: %d', total); 
 
+        accountToUpdate.data.amount = total;
+
+        _accountDb.updateAccount(accountToUpdate.id, accountToUpdate.data);
 
     }
 }

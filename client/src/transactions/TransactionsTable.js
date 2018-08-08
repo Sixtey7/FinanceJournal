@@ -42,11 +42,15 @@ class TransactionsTable extends Component {
                 onBlur={ e => {
                     console.log('on blur running!');
                     const transaction = this.state.transactions[cellInfo.index];
-                    transaction['data'][cellInfo.column.id] = e.target.innerText;
 
-                    console.log('Set the property to: ' + JSON.stringify(transaction));
+                    //check to see if anything has been changed
+                    if (transaction['data'][cellInfo.column.id] !== e.target.innerText) {
+                        transaction['data'][cellInfo.column.id] = e.target.innerText;
 
-                    this._updateTransaction(transaction['id'], transaction['data']);
+                        console.log('Set the property to: ' + JSON.stringify(transaction));
+
+                        this._updateTransaction(transaction['id'], transaction['data']);
+                    }
                 }}
                 dangerouslySetInnerHTML={{
                     __html: this.state.transactions[cellInfo.index]['data'][cellInfo.column.id]
@@ -84,14 +88,21 @@ class TransactionsTable extends Component {
                             amount = value
                         }
 
+                        if (transaction['data']['amount'] !== amount) {
+                            console.log('updating the amount');
 
-                        transaction['data']['amount'] = amount;
-                        this._updateTransaction(transaction['id'], transaction['data']);
+                            transaction['data']['amount'] = amount;
+                            this._updateTransaction(transaction['id'], transaction['data']);
+                        }
+
                     }
                     else {
                         console.log('cell was empty - blank out the value');
-                        transaction['data']['amount'] = 0;
-                        this._updateTransaction(transaction['id'], transaction['data']);
+                        if ((cellInfo.column.Header === 'Debit' && transaction.data.amount < 0) || (cellInfo.column.Header === 'Credit' && transaction.data.amount > 0)) {
+                            console.log('determined that the amount needed to be blanked out');
+                            transaction['data']['amount'] = 0;
+                            this._updateTransaction(transaction['id'], transaction['data']);
+                        }
                     }
 
                     this.massageDataset(allTrans);
