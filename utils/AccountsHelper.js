@@ -82,6 +82,13 @@ class AccountsHelper {
     async updateDynamicAccount(accountId) {
         let allAccounts = await _transDb.getTransactionsForAccount(accountId);
         _logger.debug('found %d transactions for the account that need updating!', allAccounts.length);
+        //start building the total
+        let total = 0;
+        allAccounts.foreach(function(thisTrans) {
+
+        });
+
+        _logger.debug('build the total: %d', total);
 
 
     }
