@@ -46,7 +46,7 @@ class TransDb {
         var client = await _pgHelper.getPool().connect();
         try {
             //TODO: Need to figure out how to query inside of a data json blob
-            let result = await client.query('SELECT * FROM ' + _pgHelper.getTransactionsTableName() + ' where account = $1', [accountId]);
+            let result = await client.query('SELECT * FROM ' + _pgHelper.getTransactionsTableName() + ' where data->>\'accountId\'= $1', [accountId]);
             if (result.rows) {
                 return result.rows;
             }
