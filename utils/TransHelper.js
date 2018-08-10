@@ -36,7 +36,7 @@ class TransHelper {
                 allKeys.push(newKey);
             }
 
-            _accountHelper.determineAndUpdateDynamicAccount(allTransToInsert[0].data.accountId);
+            _accountHelper.determineAndUpdateDynamicAccount(allTransToInsert[0].accountId);
         }
 
 

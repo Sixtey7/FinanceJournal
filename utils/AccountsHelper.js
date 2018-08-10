@@ -17,7 +17,7 @@ class AccountsHelper {
 
     async insertAccountIntoDatabase(accountToInsert) {
         if (this.validator(accountToInsert)) {
-            return await _accountDb.insertAccountIntoDatabase(accountToInsert);
+            return await _accountDb.insertAccount(accountToInsert);
         }
         else {
             _logger.warn('Account to be inserted failed validation with error %s', this.ajv.errorsText(this.validator.errors));
