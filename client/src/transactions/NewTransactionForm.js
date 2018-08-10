@@ -17,7 +17,6 @@ class NewTransactionForm extends Component {
     }
 
     componentWillMount() {
-        //super(); 
         //need to get the list of accounts to populate the dropdown
         fetch('/accounts')
             .then(res => res.json())
