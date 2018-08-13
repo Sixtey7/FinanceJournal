@@ -46,6 +46,14 @@ class NewAccountForm extends Component {
                             rules: [{ required: true, message: 'Please enter a title!', whitespace: true}]
                         })(<Input placeholder="title"/>)}
                     </FormItem>
+
+                    <FormItem label = "Amount"
+                        {...formItemLayout}
+                    >
+                        {getFieldDecorator('amount', {
+                            rules: [{required: true, message: 'Please enter an amount!', whitespace: true}, { validator: this.validateAmount}]
+                        })(<Input type="text"/>)}
+                    </FormItem>
                 </Form>
             </Modal>
         )
