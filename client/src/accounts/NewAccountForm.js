@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Modal, Form, Input, Select } from 'antd';
+import { Modal, Form, Input, Switch } from 'antd';
 
 const Option = Select.Option;
 
@@ -53,6 +53,16 @@ class NewAccountForm extends Component {
                         {getFieldDecorator('amount', {
                             rules: [{required: true, message: 'Please enter an amount!', whitespace: true}, { validator: this.validateAmount}]
                         })(<Input type="text"/>)}
+                    </FormItem>
+                    <FormItem label = "Notes"
+                        {...formItemLayout}
+                    >
+                        {getFieldDecorator('notes')(<Input type="textarea"/>)}
+                    </FormItem>
+                    <FormItem label = "Dynamic"
+                        {...formItemLayout}
+                    >
+                        {getFieldDecorator('dynamic', { valuePropName: 'checked'})(<Switch/>)}
                     </FormItem>
                 </Form>
             </Modal>
