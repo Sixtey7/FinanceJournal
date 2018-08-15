@@ -40,7 +40,7 @@ class Accounts extends Component {
         //build the new account 
         let account = {
             name: values.title,
-            amount: values.amount,
+            amount: parseInt(values.amount, 10),
             notes: values.notes,
             dynamic: values.dynamic
         };
@@ -66,13 +66,29 @@ class Accounts extends Component {
         this.setState({ formvisible: false });
     }
 
+    handleCancel = () => {
+        this.form.resetFields();
+        this.setState({ formvisible: false });
+    }
+
+    saveFormRef = (form) => {
+        this.form  = form;
+    }
+
     render() {
+        const NewAcctForm = Form.create()(NewAccountForm)
         return (
-            <div>`
+            <div>
                 <div className = "headerBar">
                     <h1>Accounts</h1>
                     <div>
-                        <Button className = "btn btn-default newAccountsButton">Add</Button>
+                        <Button className = "btn btn-default newAccountsButton" onClick={this.showModal}>Add</Button>
+                        <NewAcctForm
+                            formvisible = { this.state.formvisible }
+                            onCancel = { this.handleCancel }
+                            onCreate = { this.handleCreate }
+                            ref = { this.saveFormRef }
+                        />
                     </div>
                 </div>
 

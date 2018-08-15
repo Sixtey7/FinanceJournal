@@ -1,8 +1,6 @@
 import React, { Component } from 'react';
 import { Modal, Form, Input, Switch } from 'antd';
 
-const Option = Select.Option;
-
 class NewAccountForm extends Component {
     
     validateAmount = (rule, value, callback) => {
@@ -15,7 +13,7 @@ class NewAccountForm extends Component {
     }
 
     render() {
-        const { formvisible, onCancel, onCreate, from } = this.props;
+        const { formvisible, onCancel, onCreate, form } = this.props;
         const { getFieldDecorator } = form;
         const FormItem = Form.Item;
 

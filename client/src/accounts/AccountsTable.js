@@ -20,7 +20,7 @@ class AccountsTable extends Component {
             .then(accounts => accounts.sort(this._sortAccounts))
             .then(accounts => this.setState( { accounts }));
 
-       //     this.props.onRef(this);
+        this.props.onRef(this);
     }
 
     componentWillUnmount() {
@@ -119,6 +119,18 @@ class AccountsTable extends Component {
         else {
             return { __html: '' }
         }
+    }
+
+    addAccountToTable(newAccount) {
+        console.log('Got the account: ' + JSON.stringify(newAccount));
+
+        let allAccounts = this.state.accounts;
+
+        allAccounts.push(newAccount);
+
+        allAccounts.sort(this._sortAccounts);
+
+        this.setState({ accounts: allAccounts });
     }
 
     async _updateAccount(id, data) {
