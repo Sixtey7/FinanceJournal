@@ -2,7 +2,9 @@ import React, { Component } from 'react';
 import { Modal, Form, Input, Switch } from 'antd';
 
 class NewAccountForm extends Component {
-    
+
+    state = ( {dynamic: false });
+
     validateAmount = (rule, value, callback) => {
         if (isNaN(value)) {
             callback('Please enter a valid number!');
@@ -10,6 +12,10 @@ class NewAccountForm extends Component {
         }
 
         callback();
+    }
+
+    onSwitchClick = (currentState) => {
+        this.setState({ dynamic: currentState});
     }
 
     render() {
@@ -50,7 +56,7 @@ class NewAccountForm extends Component {
                     >
                         {getFieldDecorator('amount', {
                             rules: [{required: true, message: 'Please enter an amount!', whitespace: true}, { validator: this.validateAmount}]
-                        })(<Input type="text"/>)}
+                        })(<Input type="text" disabled={this.state.dynamic}/>)}
                     </FormItem>
                     <FormItem label = "Notes"
                         {...formItemLayout}
@@ -60,7 +66,7 @@ class NewAccountForm extends Component {
                     <FormItem label = "Dynamic"
                         {...formItemLayout}
                     >
-                        {getFieldDecorator('dynamic', { valuePropName: 'checked'})(<Switch/>)}
+                        {getFieldDecorator('dynamic', { valuePropName: 'checked'})(<Switch onClick={this.onSwitchClick}/>)}
                     </FormItem>
                 </Form>
             </Modal>
