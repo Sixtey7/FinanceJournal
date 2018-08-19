@@ -16,6 +16,9 @@ class NewAccountForm extends Component {
 
     onSwitchClick = (currentState) => {
         this.setState({ dynamic: currentState});
+        if (currentState) {
+            this.props.form.setFieldsValue({ amount: 0 });
+        }
     }
 
     render() {
