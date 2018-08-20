@@ -4,7 +4,7 @@ import './TransactionsTable.css'
 import 'react-table/react-table.css';
 
 class TransactionsTable extends Component {
-    state = {transactions: []}
+    state = {transactions: [], page: 0, pageSize: 75}
 
     constructor() {
         super();
@@ -20,14 +20,21 @@ class TransactionsTable extends Component {
             .then(res => res.json())
             .then(transactions => transactions.sort(this._sortTrans))
             .then(transactions => this.massageDataset(transactions))
-            .then(transactions => this.setState({ transactions }));
+            .then(transactions => this.setState({ transactions }))
+            .then(() => this._determinePage());
 
             //TODO: set the default page here and see if that works as expected 
             //                    page = { Math.floor(this.state.transactions.length / 75) }
 
-            this.props.onRef(this)
+            this.props.onRef(this);
 
+    }
 
+    _determinePage() {
+        //floor because the page count starts at 0
+        let page = Math.floor(this.state.transactions.length / this.state.pageSize);
+
+        this.setState({page});
     }
       
     componentWillUnmount() {
@@ -320,11 +327,15 @@ class TransactionsTable extends Component {
                         }
                         return { };
                     }}
-                    defaultPageSize={75}
+                    defaultPageSize={this.state.pageSize}
                     minRows={0}
                     showPaginationTop = { true }
                     pageSizeOptions = { [5, 10, 20, 25, 50, 75, 100, 1000] }
                     className="-highlight"
+                    page = { this.state.page }
+                    onPageChange = { page => this.setState({ page })}
+                    onPageSizeChange={(pageSize, page) =>
+                        this.setState({ page, pageSize })}
                 />
             </div>
         );
